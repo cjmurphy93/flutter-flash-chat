@@ -101,6 +101,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       _firestore.collection('messages').add({
                         'text': messageText,
                         'sender': loggedInUser.email,
+                        'timeStamp': Timestamp.now(),
+                        'ts': FieldValue.serverTimestamp(),
                       });
                     },
                     child: Text(
@@ -122,7 +124,10 @@ class MessagesStream extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: _firestore.collection('messages').snapshots(),
+      stream: _firestore
+          .collection('messages')
+          .orderBy('ts', descending: true)
+          .snapshots(),
       builder: (context, snapshot) {
         List<MessageBubble> messageBubbles = [];
         if (snapshot.hasData) {
@@ -131,19 +136,23 @@ class MessagesStream extends StatelessWidget {
             final data = message.data() as Map;
             final messageText = data['text'];
             final messageSender = data['sender'];
+            final messageTs = data['timeStamp'];
 
             final currentUser = loggedInUser.email;
 
             final messageBubble = MessageBubble(
-                sender: messageSender,
-                text: messageText,
-                isMe: currentUser == messageSender);
+              sender: messageSender,
+              text: messageText,
+              ts: messageTs,
+              isMe: currentUser == messageSender,
+            );
 
             messageBubbles.add(messageBubble);
           }
         }
         return Expanded(
           child: ListView(
+            reverse: true,
             padding: EdgeInsets.symmetric(
               horizontal: 10.0,
               vertical: 20.0,
@@ -157,10 +166,16 @@ class MessagesStream extends StatelessWidget {
 }
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({this.sender, this.text, this.isMe});
+  MessageBubble({
+    this.sender,
+    this.text,
+    this.ts,
+    this.isMe,
+  });
 
   final String sender;
   final String text;
+  final Timestamp ts;
   final bool isMe;
 
   @override
@@ -172,6 +187,7 @@ class MessageBubble extends StatelessWidget {
             isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
+            // '$sender @ $ts',
             sender,
             style: TextStyle(
               fontSize: 12.0,
