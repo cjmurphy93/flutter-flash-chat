@@ -70,6 +70,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               RoundedButton(
                 title: 'Register',
                 onPressed: () async {
+                  setState(() {
+                    showSpinner = true;
+                  });
                   try {
                     final newUser = await _auth.createUserWithEmailAndPassword(
                       email: email,
@@ -83,6 +86,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     }
                   } catch (e) {
                     print(e);
+                  } finally {
+                    setState(() {
+                      showSpinner = false;
+                    });
                   }
                 },
                 color: Colors.blueAccent,
