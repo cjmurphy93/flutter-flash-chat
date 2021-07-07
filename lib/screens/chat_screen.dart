@@ -34,17 +34,25 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  void getMessages() async {
-    var messages;
-    await _firestore
-        .collection('messages')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        messages = doc.data();
-        print(messages);
-      });
-    });
+  // void getMessages() async {
+  //   var messages;
+  //   await _firestore
+  //       .collection('messages')
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //     querySnapshot.docs.forEach((doc) {
+  //       messages = doc.data();
+  //       print(messages);
+  //     });
+  //   });
+  // }
+
+  void messagesStream() async {
+    await for (var snapshot in _firestore.collection('messages').snapshots()) {
+      for (var message in snapshot.docs) {
+        print(message.data());
+      }
+    }
   }
 
   @override
