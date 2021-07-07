@@ -79,22 +79,29 @@ class _ChatScreenState extends State<ChatScreen> {
             StreamBuilder<QuerySnapshot>(
               stream: _firestore.collection('messages').snapshots(),
               builder: (context, snapshot) {
-                List<Widget> messageWidgets = [];
+                List<MessageBubble> messageBubbles = [];
                 if (snapshot.hasData) {
                   final messages = snapshot.data.docs;
                   for (var message in messages) {
                     final data = message.data() as Map;
                     final messageText = data['text'];
                     final messageSender = data['sender'];
-                    final messageWidget = Text(
-                      '$messageText from $messageSender', style: TextStyle(fontSize: 50.0,),
+
+                    final messageBubble = MessageBubble(
+                      sender: messageSender,
+                      text: messageText,
                     );
-                    messageWidgets.add(messageWidget);
+
+                    messageBubbles.add(messageBubble);
                   }
                 }
                 return Expanded(
                   child: ListView(
-                    children: messageWidgets,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 10.0,
+                      vertical: 20.0,
+                    ),
+                    children: messageBubbles,
                   ),
                 );
               },
@@ -129,6 +136,41 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class MessageBubble extends StatelessWidget {
+  MessageBubble({
+    this.sender,
+    this.text,
+  });
+
+  final String sender;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(10.0),
+      child: Material(
+        elevation: 5.0,
+        borderRadius: BorderRadius.circular(30.0),
+        color: Colors.lightBlueAccent,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: 10.0,
+            horizontal: 20.0,
+          ),
+          child: Text(
+            '$text from $sender',
+            style: TextStyle(
+              fontSize: 15.0,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );
