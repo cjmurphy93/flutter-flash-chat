@@ -47,13 +47,13 @@ class _ChatScreenState extends State<ChatScreen> {
   //   });
   // }
 
-  void messagesStream() async {
-    await for (var snapshot in _firestore.collection('messages').snapshots()) {
-      for (var message in snapshot.docs) {
-        print(message.data());
-      }
-    }
-  }
+  // void messagesStream() async {
+  //   await for (var snapshot in _firestore.collection('messages').snapshots()) {
+  //     for (var message in snapshot.docs) {
+  //       print(message.data());
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -87,13 +87,15 @@ class _ChatScreenState extends State<ChatScreen> {
                     final messageText = data['text'];
                     final messageSender = data['sender'];
                     final messageWidget = Text(
-                      '$messageText from $messageSender',
+                      '$messageText from $messageSender', style: TextStyle(fontSize: 50.0,),
                     );
                     messageWidgets.add(messageWidget);
                   }
                 }
-                return Column(
-                  children: messageWidgets,
+                return Expanded(
+                  child: ListView(
+                    children: messageWidgets,
+                  ),
                 );
               },
             ),
